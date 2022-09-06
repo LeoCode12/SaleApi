@@ -2,7 +2,7 @@ const errors = require('http-errors')
 const Producto = require("../models/producto.model")
 
 const createProducto = (newData)=>{
-    const newProducto = new Producto(newData)
+    const newProducto = new Producto(newData)   
 
     const error = newProducto.validateSync()
 
@@ -10,6 +10,7 @@ const createProducto = (newData)=>{
         console.error("error: ",error)
         throw new errors(400, 'validation failed')
     }
+
     return newProducto.save()
 }
 
@@ -21,6 +22,10 @@ const getById = (id) =>  {
         throw new errors(404, 'Producto Not Found')
     }
     return productoFound
+}
+
+const getProductoByIdUser = (id) =>{
+    return Producto.find({user: id})
 }
 
 const updateProducto = (id, newData) => {
@@ -43,5 +48,6 @@ module.exports = {
     getAll,
     getById,
     updateProducto,
-    deleteProducto
+    deleteProducto,
+    getProductoByIdUser
 }

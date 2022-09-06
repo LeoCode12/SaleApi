@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-
+user = require('./user.model')
 const productoSchema = mongoose.Schema({
     marca_producto: {
         type: String,
@@ -17,6 +17,10 @@ const productoSchema = mongoose.Schema({
     imagen_producto: {
         type: String,
         required: false
+    },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
     }
 })
 

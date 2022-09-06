@@ -17,7 +17,10 @@ async function login (email, password){
     }
 
     //Expedir token
-    return jwt.sign({id: userFound._id})
+    return {
+        token: jwt.sign({id: userFound._id}),
+        id : userFound._id
+    }
 }
 
 

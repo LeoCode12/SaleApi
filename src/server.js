@@ -3,6 +3,7 @@ const cors = require('cors')
 
 const productoRouter = require("./routers/producto.router")
 const userRouter = require('./routers/user.router')
+const almacenRouter = require('./routers/almacen.router')
 const authRouter = require('./routers/auth.router')
 
 const app = express()
@@ -12,6 +13,7 @@ app.use(cors())
 
 app.use('/producto', productoRouter)
 app.use('/user', userRouter)
+app.use('/almacen', almacenRouter)
 app.use('/auth', authRouter)
 
 app.get('/', (request, response) =>{

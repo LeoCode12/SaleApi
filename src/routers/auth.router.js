@@ -12,11 +12,15 @@ router.post('/login', async(request, response)=>{
         
         if(!email) throw new createError(400, 'Email is required')
         if(!password) throw new createError(400, 'Password is required')
-
-        const token = await user.login(email, password)
+        
+        const data = await user.login(email, password)
+        const {token, id} = data
+ 
         response.json({
             ok: true,
-            token
+            message: "Datos de usuario",
+            user: {token, id}
+            
         })
         
     } catch (error) {

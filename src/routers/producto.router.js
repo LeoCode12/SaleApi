@@ -2,6 +2,7 @@ const express = require("express")
 const createErrors = require("http-errors")
 
 const Producto = require("../usercases/producto.usercase")
+const User = require('../usercases/user.usercase')
 const authMiddleware = require('../midlewares/auth.midleware')
 
 const router = express.Router()
@@ -9,11 +10,24 @@ const router = express.Router()
 // router.use(authMiddleware)
 
 router.post('/', authMiddleware, async (request, response)=>{
+    const {user} = request.query
+    const infUser = await User.getUserById(user)
     try{
-        const newProducto = await Producto.createProducto(request.body)
+        let newProducto
+        let message
+        if(infUser.rol != 'Administrador'){
+            message = 'No eres Administrador'
+        }else if(infUser.rol == 'Administrador'){
+            const data={
+                ...request.body,
+                user: user
+            }
+            newProducto = await Producto.createProducto(data)
+            message = 'Producto Creado'
+        }
         response.json({
             ok: true,
-            message: 'Producto Creado',
+            message: message,
             producto: newProducto
         })
     }
@@ -27,12 +41,19 @@ router.post('/', authMiddleware, async (request, response)=>{
 })
 
 router.get('/', async(request, response)=>{
+    const {user} = request.query
     try {
-        const productoAll = await Producto.getAll()
+        let getProductos
+        if(!user){
+            getProductos = await Producto.getAll()
+        }else if(!!user){
+            getProductos = await Producto.getProductoByIdUser(user)
+        }
+
         response.json({
             ok: true,
             mesagge: "Mostrando todos los productos",
-            allProducto: productoAll
+            productos: getProductos
         })
     } catch (error) {
         response.json({
@@ -62,13 +83,22 @@ router.get('/:id', async(request, response)=>{
 })
 
 router.patch('/:id', authMiddleware, async(request, response) =>{
+    const {user} = request.query
+    const infUser = await User.getUserById(user)
     try {
-        const updateProducto = await Producto.updateProducto(request.params.id, request.body)
-        response.json({
-            ok: true,
-            message: 'Producto Actualizado',
-            update: updateProducto
-        })
+        if(infUser.rol != 'Administrador'){
+            response.json({
+                ok: true,
+                message: 'No eres Administrador'
+            })
+        }else if(infUser.rol == 'Administrador'){
+            const updateProducto = await Producto.updateProducto(request.params.id, request.body)
+            response.json({
+                ok: true,
+                message: 'Producto Actualizado',
+                update: updateProducto
+            })
+        }
     } catch (error) {
         response.json({
             ok: false,
@@ -78,22 +108,30 @@ router.patch('/:id', authMiddleware, async(request, response) =>{
 })
 
 router.delete('/:id', authMiddleware, async(request, response)=>{
+    const {user} = request.query
+    const infUser = await User.getUserById(user)
     try {
-        const deleteProducto = await Producto.deleteProducto(request.params.id)
-        
-        if(!deleteProducto){
-            response.status(404, 'Producto Not Found')
+        if (infUser.rol != 'Administrador') {
             response.json({
-                ok:false,
-                message: deleteProducto
+                ok: false,
+                message: 'No eres Administrador'
+            })
+        }else if(infUser.rol == 'Administrador'){
+            const deleteProducto = await Producto.deleteProducto(request.params.id)
+        
+            if(!deleteProducto){
+                response.status(404, 'Producto Not Found')
+                response.json({
+                    ok:false,
+                    message: deleteProducto
+                })
+            }
+            response.json({
+                ok: true,
+                message: 'Producto Eliminado',
+                deleteProducto: deleteProducto
             })
         }
-
-        response.json({
-            ok: true, 
-            message: 'Producto Eliminado',
-            delete: deleteProducto
-        })
     } catch (error) {
         response.status(400)
         response.json({

@@ -1,7 +1,8 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
+user = require('./user.model')
 
 const almacenSchema = mongoose.Schema({
-    warehouseTyoe:{
+    warehouseType:{
         type: String,
         required: true
     },
@@ -9,12 +10,14 @@ const almacenSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    user: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'user'
-        }
-    ]
+    warehouseStatus:{
+        type: Boolean,
+        required: true
+    },
+    user:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    }
 })
 
 module.exports = mongoose.model('Almacen', almacenSchema)

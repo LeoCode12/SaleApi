@@ -5,7 +5,7 @@ function auth (request, response, next){
         const authorization = request.headers.authorization || ''
         const token = authorization.replace('Bearer ', '')
         const isValidToken = jwt.verify(token)
-        console.log(isValidToken);
+        //console.log(isValidToken);
         next()
     } catch (error) {
         response.status(401)
